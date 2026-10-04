@@ -1,227 +1,261 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الفهرس</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+ <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        padding: 20px;
+        background: #f5f0e8;
+    }
+    
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #fffef9;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        overflow: hidden;
+        border: 1px solid #d4c9a8;
+    }
+    .header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    padding: 20px 25px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    position: relative;
+}
+
+.header h1 {
+    font-size: 26px;
+	color: #4d0019;
+    margin: 0;
+}
+
+.header p {
+    font-size: 14px;
+	color: #05144d;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.header .back-icon {
+    position: absolute;
+    right: 25px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #a60714;
+	الرجوع
+    transition: transform 0.3s ease;
+    user-select: none;
+}
+
+.header .back-icon:hover {
+    transform: scale(1.2);
+}
+  <!--   .header {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        padding: 25px;
+        text-align: center;
+        color: white;
+    }
+    
+    .header h1 {
+        font-size: 26px;
+		color: #4d0019;
+        margin-bottom: 8px;
+    }
+    
+    .header p {
+        font-size: 14px;
+		color: #05144d;
+        opacity: 0.9;
+    } -->
+    
+    /* خلفية الدفتر المسطر */
+    .toc-content {
+        position: relative;
+        padding: 0 40px;
+        max-height: 75vh;
+        overflow-y: auto;
+        background-color: #fffef9;
+        /* خطوط أفقية كل 40 بكسل */
+        background-image: repeating-linear-gradient(
+            transparent,
+            transparent 39px,
+            #b8d4e8 39px,
+            #b8d4e8 40px
+        );
+        background-size: 100% 40px;
+        background-position: 0 0;
+    }
+    
+    /* خط الهامش الأحمر */
+    .toc-content::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 60px;
+        width: 2px;
+        height: 2000%;
+        background: rgba(220, 80, 80, 0.3);
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .toc-item {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        border-radius: 4px;
+        /* الارتفاع مطابق لارتفاع السطر تماماً */
+        height: 40px;
+        /* لضمان التمركز العمودي */
+        line-height: 40px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .toc-item:hover {
+        background: rgba(79, 172, 254, 0.12);
+        transform: translateX(-3px);
+    }
+    
+    .toc-item.level-1 {
+        font-weight: bold;
+        font-size: 17px;
+        color: #1a3a5c;
+    }
+    
+    .toc-item.level-2 {
+        font-size: 15px;
+        color: #2c3e50;
+    }
+    
+    .toc-item.level-3 {
+        font-size: 14px;
+        color: #555;
+    }
+    
+	/* الكود الجديد (الحل) */
+.toc-item .title {
+    flex: 1;
+    line-height: 1.6;          /* يعطي مسافة مريحة بين الأسطر إذا تعددت */
+    white-space: normal;       /* يسمح للنص بالنزول لسطر جديد بدلاً من القص */
+    text-align: right;         /* محاذاة النص لليمين لتناسب اللغة العربية */
+}
+    <!-- .toc-item .title {
+        flex: 1;
+		text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    } -->
+    
+    .page-num {
+        color: #4facfe;
+        font-weight: bold;
+        min-width: 40px;
+        text-align: left;
+        font-size: 15px;
+        direction: ltr;
+    }
+    
+    .back-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: yellow;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+        transition: all 0.3s ease;
+        z-index: 100;
+    }
+    
+    .back-btn:hover {
+        transform: scale(1.1);
+		
+    }
+    
+    /* شريط التمرير */
+    .toc-content::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .toc-content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .toc-content::-webkit-scrollbar-thumb {
+        background: #b8d4e8;
+        border-radius: 3px;
+    }
+    
+    @media (max-width: 768px) {
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            padding: 20px;
-            background: #f5f0e8;
+            padding: 10px;
         }
         
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #fffef9;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            overflow: hidden;
-            border: 1px solid #d4c9a8;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            padding: 20px 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            position: relative;
-        }
-
         .header h1 {
-            font-size: 26px;
-            color: #4d0019;
-            margin: 0;
-        }
-
-        .header p {
-            font-size: 14px;
-            color: #05144d;
-            opacity: 0.9;
-            margin: 0;
-        }
-
-        .header .back-icon {
-            position: absolute;
-            right: 25px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #a60714;
-            transition: transform 0.3s ease;
-            user-select: none;
-        }
-
-        .header .back-icon:hover {
-            transform: scale(1.2);
+            font-size: 20px;
         }
         
-        /* خلفية الدفتر المسطر */
         .toc-content {
-            position: relative;
-            padding: 10px 40px;
-            max-height: 75vh;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            background-color: #fffef9;
-            background-image: repeating-linear-gradient(
-                transparent,
-                transparent 39px,
-                #b8d4e8 39px,
-                #b8d4e8 40px
-            );
-            background-size: 100% 40px;
-            background-position: 0 10px;
+            padding: 0 15px;
+            background-size: 100% 38px;
         }
         
-        /* شريط التمرير */
-        .toc-content::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .toc-content::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        
-        .toc-content::-webkit-scrollbar-thumb {
-            background: #b8d4e8;
-            border-radius: 3px;
-        }
-        
-        /* تنسيق عنصر الفهرس - التعديل الجوهري هنا */
         .toc-item {
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start; /* مهم جداً لمحاذاة النص من الأعلى عند التفافه */
-            padding: 8px 10px;
-            border-radius: 4px;
-            min-height: 40px; /* ارتفاع أدنى بدلاً من ثابت */
-            position: relative;
-            z-index: 2;
-            gap: 10px;
-        }
-        
-        .toc-item:hover {
-            background: rgba(79, 172, 254, 0.12);
-            transform: translateX(-3px);
+            height: 38px;
+            line-height: 38px;
+            padding: 0 5px;
         }
         
         .toc-item.level-1 {
-            font-weight: bold;
-            font-size: 17px;
-            color: #1a3a5c;
-            margin-top: 15px;
-            padding-top: 12px;
-            border-top: 2px solid #b8d4e8;
+            font-size: 15px;
         }
         
         .toc-item.level-2 {
-            font-size: 15px;
-            color: #2c3e50;
+            font-size: 14px;
         }
         
         .toc-item.level-3 {
-            font-size: 14px;
-            color: #555;
+            font-size: 13px;
         }
-        
-        .toc-item .title {
-            flex: 1;
-            line-height: 1.6; /* يسمح بالتفاف النص بشكل مريح ومقروء */
-            white-space: normal; /* يسمح للنص بالنزول لسطر جديد بدلاً من القص */
-            text-align: right; /* محاذاة النص لليمين لتناسب العربية */
-        }
-        
-        .page-num {
-            color: #4facfe;
-            font-weight: bold;
-            min-width: 40px;
-            text-align: left;
-            font-size: 15px;
-            direction: ltr;
-            flex-shrink: 0; /* يمنع انكماش رقم الصفحة */
-            padding-top: 4px; /* لمحاذاة رقم الصفحة مع أول سطر من العنوان */
-        }
-        
-        .back-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: yellow;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
-            transition: all 0.3s ease;
-            z-index: 100;
-        }
-        
-        .back-btn:hover {
-            transform: scale(1.1);
-        }
-        
-        /* تحسينات الجوال */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            .toc-content {
-                padding: 10px 15px;
-                background-size: 100% 40px;
-                background-position: 0 10px;
-            }
-            
-            .toc-item {
-                padding: 6px 5px;
-                min-height: 40px;
-            }
-            
-            .toc-item.level-1 {
-                font-size: 15px;
-            }
-            
-            .toc-item.level-2 {
-                font-size: 14px;
-            }
-            
-            .toc-item.level-3 {
-                font-size: 13px;
-            }
-            
-            .page-num {
-                font-size: 13px;
-                min-width: 35px;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <span class="back-icon" onclick="window.location.href='author.html'">↩</span>
-            <h1>📚 فهرس الكتاب</h1>
-        </div>
-        
+       <div class="header">
+
+    <span class="back-icon" onclick="window.location.href='author.html'">↩</span>
+	
+    <h1>📚 فهرس الكتاب</h1>
+   <!--  <p>كتاب أهل البيت عند شيخ الإسلام ابن تيمية</p> -->
+</div>
         <div class="toc-content">
             <div class="toc-item level-1" onclick="openPage(11)">
                 <span class="title">تمهيد: ترجمة شيخ الإسلام ابن تيمية</span>
@@ -610,20 +644,555 @@
         </div>
     </div>
     
-    <button class="back-btn" onclick="window.location.href='author.html'">↩</button>
 
-    <script>
-        // تحويل كل أرقام الصفحات تلقائياً للأرقام العربية بشكل صحيح
-        document.querySelectorAll('.page-num').forEach(function(el) {
-            const num = el.textContent;
-            const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-            el.textContent = num.replace(/\d/g, d => arabicDigits[d]);
-        });
+   
+	<script>
+    // تحويل كل أرقام الصفحات تلقائياً
+    document.querySelectorAll('.page-num').forEach(function(el) {
+        const num = el.textContent;
+        const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','','٨','٩'];
+        el.textContent = num.replace(/\d/g, d => arabicDigits[d]);
+    });
+    
+    function openPage(pageNum) {
+        const imgNum = pageNum + 2;
+        window.location.href = `reader.html?page=${imgNum}`;
+    }
+</script>
+     
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الفهرس</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .toc-content {
+            padding: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .toc-item {
+            padding: 15px 20px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-right: 4px solid #4facfe;
+        }
+        
+        .toc-item:hover {
+            background: #e3f2fd;
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+        
+        .toc-item.level-1 {
+            font-weight: bold;
+            font-size: 18px;
+            background: #e3f2fd;
+        }
+        
+        .toc-item.level-2 {
+            font-size: 16px;
+            margin-right: 20px;
+        }
+        
+        .toc-item.level-3 {
+            font-size: 15px;
+            margin-right: 40px;
+            color: #555;
+        }
+        
+        .page-num {
+            color: #4facfe;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: left;
+        }
+        
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .toc-item {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+            
+            .toc-item.level-2 {
+                margin-right: 15px;
+            }
+            
+            .toc-item.level-3 {
+                margin-right: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 فهرس الكتاب</h1>
+        </div>
+        <div class="toc-content">
+            <div class="toc-item level-1" onclick="openPage(11)">
+                <span>تمهيد: ترجمة شيخ الإسلام ابن تيمية</span>
+                <span class="page-num">11</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(13)">
+                <span>اسمه ونسبه</span>
+                <span class="page-num">13</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(15)">
+                <span>سبب التسمية ب(تيمية)</span>
+                <span class="page-num">15</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(15)">
+                <span>مولده ونشأته</span>
+                <span class="page-num">15</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(18)">
+                <span>شيوخه وتلاميذه</span>
+                <span class="page-num">18</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(20)">
+                <span>مكانته العلمية</span>
+                <span class="page-num">20</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(23)">
+                <span>منزلته في علم أصول الاعتقاد ومقالات الفرق والملل والنحل</span>
+                <span class="page-num">23</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(29)">
+                <span>عدله مع خصومه</span>
+                <span class="page-num">29</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(32)">
+                <span>محنته وسجنه</span>
+                <span class="page-num">32</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(34)">
+                <span>وفاته</span>
+                <span class="page-num">34</span>
+            </div>
+            <div class="toc-item level-1" onclick="openPage(39)">
+                <span>الفصل الأول: تعريف اهل البيت رضي الله عنهم</span>
+                <span class="page-num">39</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(40)">
+                <span>المبحث الأول: تعريف (الآل) و(الأهل) و(البيت) في اللغة</span>
+                <span class="page-num">40</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(48)">
+                <span>المبحث الثاني: تعريف اهل البيت رضي الله عنهم في الاصطلاح</span>
+                <span class="page-num">48</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(48)">
+                <span>المطلب الأول: ذكر مذاهب اهل العلم وادلتهم</span>
+                <span class="page-num">48</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(48)">
+                <span>القول الأول: انهم الذين حرمت عليهم الصدقة</span>
+                <span class="page-num">48</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(55)">
+                <span>القول الثاني: انهم الأزواج والذرية</span>
+                <span class="page-num">55</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(57)">
+                <span>القول الثالث: ان المراد باهل البيت نساء النبي صلى الله عليه وسلم خاصة</span>
+                <span class="page-num">57</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(58)">
+                <span>القول الرابع: انهم اصحاب الكساء خاصة</span>
+                <span class="page-num">58</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(60)">
+                <span>القول الخامس: انهم امته واتباعه يوم القيامة</span>
+                <span class="page-num">60</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(63)">
+                <span>القول السادس: أنهم الأتقياء من أمته</span>
+                <span class="page-num">63</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(64)">
+                <span>المطلب الثاني: بيان الراجح من الأقوال مع مناقشة أدلة الأقوال الأخرى</span>
+                <span class="page-num">64</span>
+            </div>
+            <div class="toc-item level-1" onclick="openPage(81)">
+                <span>الفصل الثاني: فضائل أهل البيت رضي الله عنهم</span>
+                <span class="page-num">81</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(82)">
+                <span>التمهيد: فضل الصحابة رضي الله عنهم</span>
+                <span class="page-num">82</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(87)">
+                <span>المبحث الأول: فضائل أهل البيت رضي الله عنهم في الكتاب والسنة</span>
+                <span class="page-num">87</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(87)">
+                <span>تمهيد</span>
+                <span class="page-num">87</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(88)">
+                <span>المطلب الأول: فضائل أهل البيت رضي الله عنهم في الكتاب</span>
+                <span class="page-num">88</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(91)">
+                <span>المطلب الثاني: فضائل أهل البيت رضي الله عنهم في السنة</span>
+                <span class="page-num">91</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(99)">
+                <span>المبحث الثاني: فضائل أهل البيت رضي الله عنهم الخاصة</span>
+                <span class="page-num">99</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(100)">
+                <span>المطلب الأول: فضائل علي بن ابي طالب رضي الله عنه</span>
+                <span class="page-num">100</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(106)">
+                <span>المطلب الثاني: فضائل فاطمة بنت رسول الله صلى الله عليه وسلم ورضي الله عنها</span>
+                <span class="page-num">106</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(107)">
+                <span>المطلب الثالث: فضائل الحسن والحسين رضي الله عنهم</span>
+                <span class="page-num">107</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(111)">
+                <span>المطلب الرابع: بعض بني هاشم رضي الله عنهم</span>
+                <span class="page-num">111</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(113)">
+                <span>المطلب الخامس: فضائل أمهات المؤمنين رضي الله عنهن</span>
+                <span class="page-num">113</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(120)">
+                <span>المطلب السادس: بيان حقيقة الفضل المعتبر</span>
+                <span class="page-num">120</span>
+            </div>
+            <div class="toc-item level-1" onclick="openPage(129)">
+                <span>الفصل الثالث: عقائد أهل البيت رضي الله عنهم</span>
+                <span class="page-num">129</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(130)">
+                <span>المبحث الأول: مصادر تلقي أهل البيت والصحابة رضي الله عنهم للدين</span>
+                <span class="page-num">130</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(141)">
+                <span>المبحث الثاني: عقيدة أهل البيت رضي الله عنهم</span>
+                <span class="page-num">141</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(141)">
+                <span>المطلب الأول: عقيدة أهل البيت رضي الله عنهم هي عقيدة الصحابة</span>
+                <span class="page-num">141</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(144)">
+                <span>المطلب الثاني: عدم اختصاص أهل البيت رضي الله عنهم بعلم دون غيرهم من الصحابة رضي الله عنهم</span>
+                <span class="page-num">144</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(146)">
+                <span>المبحث الثالث: منزلة علماء أهل البيت عند أهل السنة والجماعة</span>
+                <span class="page-num">146</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(150)">
+                <span>المبحث الرابع: ذكر بعض ما ورد عن اهل البيت في مسائل العقيدة</span>
+                <span class="page-num">150</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(150)">
+                <span>المطلب الأول: إثبات صفات الله تعالى</span>
+                <span class="page-num">150</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(151)">
+                <span>صفة العلو</span>
+                <span class="page-num">151</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(154)">
+                <span>القرأن كلام الله غير مخلوق</span>
+                <span class="page-num">154</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(157)">
+                <span>رؤية الله تعالى في الآخرة، وإثبات صفة الوجه لله تعالى</span>
+                <span class="page-num">157</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(160)">
+                <span>صفة السمع</span>
+                <span class="page-num">160</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(161)">
+                <span>صفة المجيء</span>
+                <span class="page-num">161</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(161)">
+                <span>المطلب الثاني: إثبات القدر</span>
+                <span class="page-num">161</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(162)">
+                <span>مراتب الإيمان، القدر</span>
+                <span class="page-num">162</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(162)">
+                <span>المرتبة الأولى: العلم</span>
+                <span class="page-num">162</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(164)">
+                <span>المرتبة الثانية: الكتابة</span>
+                <span class="page-num">164</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(165)">
+                <span>المرتبة الثالثة: المشيئة والإرادة</span>
+                <span class="page-num">165</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(166)">
+                <span>المرتبة الرابعة: الخلق</span>
+                <span class="page-num">166</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(175)">
+                <span>المطلب الثالث: إثبات خلافة أبي بكر وعمر رضي الله عنهما وفضلهما</span>
+                <span class="page-num">175</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(184)">
+                <span>المبحث الخامس: براءة أهل البيت رضي الله عنهم من الرافضة</span>
+                <span class="page-num">184</span>
+            </div>
+            <div class="toc-item level-1" onclick="openPage(187)">
+                <span>الفصل الرابع: حقوق وخصائص أهل البيت رضي الله عنهم</span>
+                <span class="page-num">187</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(188)">
+                <span>تمهيد</span>
+                <span class="page-num">188</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(191)">
+                <span>المبحث الأول: حقوق أهل البيت رضي الله عنهم</span>
+                <span class="page-num">191</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(191)">
+                <span>المطلب الأول: محبة أهل البيت رضي الله عنهم وموالاتهم</span>
+                <span class="page-num">191</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(194)">
+                <span>المطلب الثاني: الصلاة على أهل البيت رضي الله عنهم</span>
+                <span class="page-num">194</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(195)">
+                <span>حكم الصلاة على واحد بعينه من أهل البيت رضي الله عنهم</span>
+                <span class="page-num">195</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(198)">
+                <span>المطلب الثالث: الخمس</span>
+                <span class="page-num">198</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(203)">
+                <span>المبحث الثاني: خصائص أهل البيت رضي الله عنهم</span>
+                <span class="page-num">203</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(203)">
+                <span>المطلب الأول: تحريم الزكاة</span>
+                <span class="page-num">203</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(207)">
+                <span>المطلب الثاني: عدم إرثهم من النبي صلى الله عليه وسلم</span>
+                <span class="page-num">207</span>
+            </div>
+            <div class="toc-item level-1" onclick="openPage(209)">
+                <span>الفصل الخامس: موقف شيخ الإسلام ابن تيمية من أحداث الفتن التي وقعت لأهل البيت رضي الله عنهم</span>
+                <span class="page-num">209</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(210)">
+                <span>المبحث الأول: اعتقاد شيخ الإسلام ابن تيمية في الصحابة رضي الله عنهم</span>
+                <span class="page-num">210</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(210)">
+                <span>أولاً: محبة الصحابة رضي الله عنهم</span>
+                <span class="page-num">210</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(212)">
+                <span>ثانياً: سلامة القلوب والألسن لهم رضي الله عنهم</span>
+                <span class="page-num">212</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(213)">
+                <span>حكم ساب الصحابة رضي الله عنهم</span>
+                <span class="page-num">213</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(215)">
+                <span>ثالثاً: عدالة الصحابة رضي الله عنهم</span>
+                <span class="page-num">215</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(217)">
+                <span>المبحث الثاني: بداية الفتنة بمقتل عثمان رضي الله عنه</span>
+                <span class="page-num">217</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(221)">
+                <span>المبحث الثالث: سبب الخلاف فيما جرى بين الصحابة رضي الله عنهم</span>
+                <span class="page-num">221</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(225)">
+                <span>المبحث الرابع: يوم الجمل</span>
+                <span class="page-num">225</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(229)">
+                <span>المبحث الخامس: يوم صفين</span>
+                <span class="page-num">229</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(229)">
+                <span>المطلب الأول: أسباب وقعة صفين</span>
+                <span class="page-num">229</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(236)">
+                <span>المطلب الثاني: علي رضي الله عنه أقرب إلى الحق من معاوية رضي الله عنه</span>
+                <span class="page-num">236</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(242)">
+                <span>المطلب الثالث: حكم علي رضي الله عنه على مقاتليه</span>
+                <span class="page-num">242</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(245)">
+                <span>المطلب الرابع: أقوال أهل العلم في القتال الذي وقع بين الصحابة رضي الله عنهم</span>
+                <span class="page-num">245</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(265)">
+                <span>المبحث السادس: موت الحسن رضي الله عنه مسموماً</span>
+                <span class="page-num">265</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(268)">
+                <span>المبحث السابع: خروج الحسين رضي الله عنه</span>
+                <span class="page-num">268</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(270)">
+                <span>الآراء في مقتل الحسين رضي الله عنه</span>
+                <span class="page-num">270</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(271)">
+                <span>مناقشة الأقوال</span>
+                <span class="page-num">271</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(274)">
+                <span>المبحث الثامن: اتهام يزيد بن معاوية بقتل الحسين رضي الله عنه</span>
+                <span class="page-num">274</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(279)">
+                <span>المبحث التاسع: ما أحدث يوم عاشوراء</span>
+                <span class="page-num">279</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(279)">
+                <span>القسم الأول: الشيعة الرافضة</span>
+                <span class="page-num">279</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(283)">
+                <span>القسم الثاني: قوم اتخذوا يوم عاشوراء بمنزلة العيد</span>
+                <span class="page-num">283</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(287)">
+                <span>المبحث العاشر: مطالبة فاطمة رضي الله عنها بإرثها من النبي صلى الله عليه وسلم</span>
+                <span class="page-num">287</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(295)">
+                <span>شبهات حول حديث: لا نورث وجوابها</span>
+                <span class="page-num">295</span>
+            </div>
+            <div class="toc-item level-1" onclick="openPage(303)">
+                <span>الخاتمة</span>
+                <span class="page-num">303</span>
+            </div>
+            <div class="toc-item level-1" onclick="openPage(305)">
+                <span>الفهارس</span>
+                <span class="page-num">305</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(305)">
+                <span>فهرس المصادر والمراجع</span>
+                <span class="page-num">305</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(305)">
+                <span>مصادر ومراجع اهل السنة وغيرها</span>
+                <span class="page-num">305</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(334)">
+                <span>مصادر ومراجع الاثني عشرية</span>
+                <span class="page-num">334</span>
+            </div>
+            <div class="toc-item level-3" onclick="openPage(339)">
+                <span>الرسائل العلمية غير المنشورة</span>
+                <span class="page-num">339</span>
+            </div>
+            <div class="toc-item level-2" onclick="openPage(341)">
+                <span>فهرس الموضوعات</span>
+                <span class="page-num">341</span>
+            </div>
+        </div>
+    </div>
+    
+    <button class="back-btn" onclick="window.location.href='author.html'">↩</button>
+    
+    <script>
         function openPage(pageNum) {
             const imgNum = pageNum + 2;
             window.location.href = `reader.html?page=${imgNum}`;
         }
     </script>
 </body>
-</html>
+</html> -->
