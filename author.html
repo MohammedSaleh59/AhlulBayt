@@ -1,40 +1,93 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2196f3">
-<link rel="icon" href="icon-192.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta charset="UTF-8">
-<title>المؤلف</title>
-<style>
-body {
-    text-align: center;
-    background: #eef;
-    font-family: Arial;
-}
-button {
-    padding: 10px 20px;
-    font-size: 18px;
-    cursor: pointer;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المؤلف</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .container:hover {
+            transform: translateY(-10px);
+        }
+        
+        .author-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #666;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .continue-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .continue-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 24px;
+            }
+            
+            .container {
+                padding: 40px 20px;
+            }
+        }
+    </style>
 </head>
-
 <body>
-
-<h2>✍️ المؤلف</h2>
-<h3>أ.د. عمر بن صالح القرموشي</h3>
-
-<br><br>
-
-<button onclick="goToBook()">📖 عرض الفهرس</button>
-
-<script>
-function goToBook() {
-    window.location.href = "book.html";
-}
-</script>
-
+    <div class="container" onclick="window.location.href='toc.html'">
+        <div class="author-icon">✍️</div>
+        <h2>تأليف</h2>
+        <h1>أ.د. عمر بن صالح القرموشي</h1>
+        <button class="continue-btn">متابعة</button>
+    </div>
 </body>
 </html>

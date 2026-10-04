@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>قراءة الكتاب</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        /* زر الرجوع للفهرس */
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover, .back-btn:active {
+            background: rgba(0,0,0,0.8);
+            transform: scale(1.1);
+        }
+        
+        /* منطقة عرض الصورة */
+        .image-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #0d0d0d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none;
+        }
+        
+        .page-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transform-origin: center center;
+            user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
+            will-change: transform;
+        }
+        
+        /* شريط التنقل السفلي */
+        .navigation {
+            background: rgba(0,0,0,0.9);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+        
+        .nav-btn:hover, .nav-btn:active {
+            transform: scale(1.1);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .nav-btn img {
+            width: 22px;
+            height: 22px;
+        }
+        
+        .page-info {
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        /* مؤشر التحميل */
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .loader.show {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-btn {
+                width: 42px;
+                height: 42px;
+            }
+            
+            .nav-btn img {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .page-info {
+                font-size: 13px;
+                min-width: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- زر الرجوع للفهرس -->
+    <button class="back-btn" onclick="window.location.href='toc.html'" title="الرجوع للفهرس">↩</button>
+    
+    <!-- منطقة الصورة -->
+    <div class="image-container" id="imageContainer">
+        <img id="pageImage" class="page-image" src="" alt="صفحة الكتاب" draggable="false">
+        <div class="loader" id="loader">جاري التحميل...</div>
+    </div>
+    
+    <!-- شريط التنقل -->
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="prevPage()" title="السابق">
+            <img src="arrow_prev.png" alt="السابق">
+        </button>
+        <div class="page-info" id="pageInfo">صفحة 1</div>
+        <button class="nav-btn" id="nextBtn" onclick="nextPage()" title="التالي">
+            <img src="arrow_next.png" alt="التالي">
+        </button>
+    </div>
+    
+    <script>
+        const MIN_SCALE = 1;
+        const MAX_SCALE = 5;
+        
+        let currentPage = 1;
+        let totalPages = 345;
+        
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let startTranslateX = 0, startTranslateY = 0;
+        
+        let initialDistance = 0;
+        let initialScale = 1;
+        let lastTapTime = 0;
+        
+        const container = document.getElementById('imageContainer');
+        const image = document.getElementById('pageImage');
+        const loader = document.getElementById('loader');
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const startPage = urlParams.get('page');
+        if (startPage) currentPage = parseInt(startPage);
+        
+        function updatePage() {
+            loader.classList.add('show');
+            const imgSrc = `a${currentPage}.png`;
+            resetZoom();
+            
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                image.src = imgSrc;
+                loader.classList.remove('show');
+            };
+            tempImg.onerror = function() {
+                loader.classList.remove('show');
+            };
+            tempImg.src = imgSrc;
+            
+			// دالة تحويل الأرقام
+function toArabicNum(num) {
+    const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    return num.toString().replace(/\d/g, function(d) {
+        return arabicDigits[d];
+    });
+}
+
+            <!-- document.getElementById('pageInfo').textContent = `صفحة ${currentPage - 2}`; -->
+			
+			document.getElementById('pageInfo').textContent = `صفحة ${toArabicNum(currentPage - 2)}`;
+			
+            document.getElementById('prevBtn').disabled = currentPage <= 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+        }
+		
+		
+
+        
+        function nextPage() {
+            if (currentPage < totalPages) { currentPage++; updatePage(); }
+        }
+        
+        function prevPage() {
+            if (currentPage > 1) { currentPage--; updatePage(); }
+        }
+        
+        function updateTransform() {
+            image.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
+        
+        function constrainPosition() {
+            if (scale <= 1) { translateX = 0; translateY = 0; return; }
+            const containerRect = container.getBoundingClientRect();
+            const imgWidth = image.naturalWidth * scale;
+            const imgHeight = image.naturalHeight * scale;
+            const maxTranslateX = Math.max(0, (imgWidth - containerRect.width) / 2);
+            const maxTranslateY = Math.max(0, (imgHeight - containerRect.height) / 2);
+            translateX = Math.max(-maxTranslateX, Math.min(maxTranslateX, translateX));
+            translateY = Math.max(-maxTranslateY, Math.min(maxTranslateY, translateY));
+        }
+        
+        function resetZoom() {
+            scale = 1; translateX = 0; translateY = 0;
+            updateTransform();
+        }
+        
+        function zoomAtPoint(clientX, clientY, factor) {
+            const rect = container.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
+            if (newScale === scale) return;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const dx = x - centerX - translateX;
+            const dy = y - centerY - translateY;
+            const scaleChange = newScale / scale;
+            translateX = translateX - dx * (scaleChange - 1);
+            translateY = translateY - dy * (scaleChange - 1);
+            scale = newScale;
+            constrainPosition();
+            updateTransform();
+        }
+        
+        container.addEventListener('mousedown', function(e) {
+            if (scale <= 1) return;
+            isDragging = true;
+            startX = e.clientX; startY = e.clientY;
+            startTranslateX = translateX; startTranslateY = translateY;
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            translateX = startTranslateX + (e.clientX - startX);
+            translateY = startTranslateY + (e.clientY - startY);
+            constrainPosition();
+            updateTransform();
+        });
+        
+        document.addEventListener('mouseup', function() { isDragging = false; });
+        
+        container.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.15 : 0.87;
+            zoomAtPoint(e.clientX, e.clientY, factor);
+        }, { passive: false });
+        
+        container.addEventListener('dblclick', function(e) {
+            if (scale > 1) resetZoom();
+            else zoomAtPoint(e.clientX, e.clientY, 2.5);
+        });
+        
+        container.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 1) {
+                const now = Date.now();
+                if (now - lastTapTime < 300) {
+                    const touch = e.touches[0];
+                    if (scale > 1) resetZoom();
+                    else zoomAtPoint(touch.clientX, touch.clientY, 2.5);
+                    e.preventDefault();
+                    return;
+                }
+                lastTapTime = now;
+                if (scale > 1) {
+                    isDragging = true;
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                    startTranslateX = translateX;
+                    startTranslateY = translateY;
+                }
+            } else if (e.touches.length === 2) {
+                isDragging = false;
+                initialDistance = getDistance(e.touches[0], e.touches[1]);
+                initialScale = scale;
+            }
+            e.preventDefault();
+        }, { passive: false });
+        
+        container.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 1 && isDragging) {
+                translateX = startTranslateX + (e.touches[0].clientX - startX);
+                translateY = startTranslateY + (e.touches[0].clientY - startY);
+                constrainPosition();
+                updateTransform();
+            } else if (e.touches.length === 2) {
+                const currentDistance = getDistance(e.touches[0], e.touches[1]);
+                const factor = currentDistance / initialDistance;
+                const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, initialScale * factor));
+                if (newScale !== scale) {
+                    const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                    const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                    zoomAtPoint(centerX, centerY, newScale / scale);
+                }
+            }
+            e.preventDefault();
+        }, { passive: false });
+        
+        container.addEventListener('touchend', function(e) {
+            if (e.touches.length === 0) isDragging = false;
+        });
+        
+        function getDistance(t1, t2) {
+            const dx = t1.clientX - t2.clientX;
+            const dy = t1.clientY - t2.clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') nextPage();
+            else if (e.key === 'ArrowRight') prevPage();
+            else if (e.key === '0') resetZoom();
+        });
+        
+        updatePage();
+    </script>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قراءة الكتاب</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .header h2 {
+            color: white;
+            font-size: 18px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+        
+        .image-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .page-image {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+        
+        .page-image.zoomed {
+            transform: scale(1.5);
+            cursor: zoom-out;
+        }
+        
+        .page-image:not(.zoomed) {
+            cursor: zoom-in;
+        }
+        
+        .navigation {
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .header h2 {
+                font-size: 14px;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .page-info {
+                font-size: 16px;
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>📖 قراءة الكتاب</h2>
+        <div class="controls">
+            <button class="btn" onclick="toggleZoom()">🔍 تكبير</button>
+            <button class="btn back-btn" onclick="window.location.href='toc.html'">↩ الفهرس</button>
+        </div>
+    </div>
+    
+    <div class="image-container">
+        <img id="pageImage" class="page-image" src="" alt="صفحة الكتاب" onclick="toggleZoom()">
+    </div>
+    
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="prevPage()">
+            <img src="arrow_prev.png" alt="السابق" style="width: 30px; height: 30px;">
+        </button>
+        <div class="page-info" id="pageInfo">صفحة 1</div>
+        <button class="nav-btn" id="nextBtn" onclick="nextPage()">
+            <img src="arrow_next.png" alt="التالي" style="width: 30px; height: 30px;">
+        </button>
+    </div>
+    
+    <script>
+        let currentPage = 1;
+        let totalPages = 345; // إجمالي الصفحات
+        
+        // الحصول على رقم الصفحة من URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const startPage = urlParams.get('page');
+        
+        if (startPage) {
+            currentPage = parseInt(startPage);
+        }
+        
+        function updatePage() {
+            const imgSrc = `a${currentPage}.png`;
+            document.getElementById('pageImage').src = imgSrc;
+            document.getElementById('pageInfo').textContent = `صفحة ${currentPage - 2}`;
+            
+            // تفعيل/تعطيل أزرار التنقل
+            document.getElementById('prevBtn').disabled = currentPage <= 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+        }
+        
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updatePage();
+            }
+        }
+        
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePage();
+            }
+        }
+        
+        function toggleZoom() {
+            const img = document.getElementById('pageImage');
+            img.classList.toggle('zoomed');
+        }
+        
+        // دعم لوحة المفاتيح
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                nextPage();
+            } else if (e.key === 'ArrowRight') {
+                prevPage();
+            } else if (e.key === '+' || e.key === '=') {
+                if (!document.getElementById('pageImage').classList.contains('zoomed')) {
+                    toggleZoom();
+                }
+            } else if (e.key === '-') {
+                if (document.getElementById('pageImage').classList.contains('zoomed')) {
+                    toggleZoom();
+                }
+            }
+        });
+        
+        // تحميل الصفحة الأولى
+        updatePage();
+    </script>
+</body>
+</html> -->
